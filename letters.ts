@@ -24,7 +24,7 @@ class Letter {
     accentType : AccentType;
     breathing: Breathing;
     iota: boolean;
-    diaresis: boolean;
+    diaeresis: boolean;
 
     constructor(letter: string, isUpper: boolean, betaLetter : string, type : LetterType,
                 accentType : AccentType = AccentType.NONE,
@@ -36,7 +36,7 @@ class Letter {
         this.accentType = accentType;
         this.breathing = breathing;
         this.iota = iota;
-        this.diaresis = diaresis;
+        this.diaeresis = diaresis;
     }
 }
 
