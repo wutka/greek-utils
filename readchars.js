@@ -8,3 +8,4 @@ for (const char of chars) {
     line = line + char;
 }
 console.log(line);
+console.log(line.length);

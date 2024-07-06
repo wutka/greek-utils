@@ -1,3 +1,5 @@
+"use strict";
+
 const { open } = require('node:fs/promises')
 
 async function load_file_async(filename) {
