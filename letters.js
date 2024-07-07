@@ -31,6 +31,44 @@ export class Letter {
         this.iota = iota;
         this.diaeresis = diaeresis;
     }
+
+    accentedBeta() {
+        let word = this.isUpper ? "*" : this.betaLetter;
+        switch (this.breathing) {
+            case Breathing.NONE:
+                break;
+            case Breathing.ROUGH:
+                word = word + "(";
+                break;
+            case Breathing.SMOOTH:
+                word = word + ")";
+                break;
+        }
+
+        switch (this.accentType) {
+            case AccentType.NONE:
+                break;
+            case AccentType.ACUTE:
+                word = word + "/";
+                break;
+            case AccentType.GRAVE:
+                word = word + "\\";
+                break;
+            case AccentType.CIRCUMFLEX:
+                word = word + "=";
+                break;
+        }
+
+        if (this.iota) {
+            word = word + "|";
+        }
+
+        if (this.diaeresis) {
+            word = word + "+";
+        }
+
+        return word;
+    }
 }
 
 export const endSigma = "ς";
@@ -216,6 +254,9 @@ export const letters = [
 export const makeBetaMap = () => {
     const betaMap = {};
     for (const letter of letters) {
+        if (letter.letter === endSigma) {
+            continue;
+        }
         if (!betaMap[letter.betaLetter]) {
             betaMap[letter.betaLetter] = [letter];
         } else {
@@ -228,6 +269,14 @@ export const makeBetaMap = () => {
 export const betaMap = makeBetaMap();
 
 export const makeLetterMap = () => {
+    const letterMap = {};
+    for (const letter of letters) {
+        letterMap[letter.letter] = letter;
+    }
+    return letterMap;
+}
+
+export const makeLetterAccentMap = () => {
     const letterMap = {};
     for (const letter of letters) {
         const beta = betaMap[letter.betaLetter];
@@ -252,7 +301,6 @@ export const makeLetterMap = () => {
             continue;
         }
 
-        letterMap[letter] = letter;
         if (!letterMap[letter.plain]) {
             letterMap[letter.plain] = [letter];
         } else {
@@ -263,4 +311,4 @@ export const makeLetterMap = () => {
 }
 
 export const letterMap = makeLetterMap();
-console.log(letterMap);
+export const letterAccentMap = makeLetterAccentMap();
