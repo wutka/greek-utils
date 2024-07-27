@@ -5,7 +5,7 @@ const { open } = require('node:fs/promises')
 async function load_file_async(filename) {
     const file = await open(filename);
 
-    lines = [];
+    let lines = [];
     for await (const line of file.readLines()) {
         lines.push(line);
     }

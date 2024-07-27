@@ -1,5 +1,68 @@
-
 import {letters, letterMap, letterAccentMap, betaMap, LetterType, Breathing, AccentType, apostrophe, endSigma} from "./letters.js";
+import {makeEnum} from "./enums.js";
+
+export const PartOfSpeech = makeEnum({
+    Adjective: "A",
+    Conjunction: "C",
+    Adverb: "D",
+    Interjection: "I",
+    Noun: "N",
+    Preposition: "P",
+    DefiniteArticle: "RA",
+    DemonstrativePronoun: "RD",
+    IndefinitePronoun: "RI",
+    PersonalPronoun: "RP",
+    RelativePronoun: "RR",
+    Verb: "V",
+    Particle: "X",
+});
+
+export const Tense = makeEnum({
+    Present: "P",
+    Imperfect: "I",
+    Future: "F",
+    Aorist: "A",
+    Perfect: "X",
+    Pluperfect: "Y",
+});
+
+export const Voice = makeEnum({
+    Active: "A",
+    Middle: "M",
+    Passive: "P",
+});
+
+export const Mood = makeEnum({
+    Indicative: "I",
+    Imperative: "D",
+    Subjunctive: "S",
+    Optative: "O",
+    Infinitive: "N",
+    Participle: "P",
+});
+
+export const Case = makeEnum({
+    Nominative: "N",
+    Genitive: "G",
+    Dative: "D",
+    Accusative: "A",
+});
+
+export const CaseNumber = makeEnum({
+    Singular: "S",
+    Plural: "P",
+});
+
+export const Gender = makeEnum({
+    Masculine: "M",
+    Feminine: "F",
+    Neuter: "N",
+});
+
+export const Degree = makeEnum({
+    Comparative: "C",
+    Superlative: "S",
+})
 
 export const splitGreekWord = word => {
     return Array.from(word).map(letter => letterMap[letter]);
