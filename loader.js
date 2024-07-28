@@ -1,26 +1,36 @@
 "use strict";
 
-const { open } = require('node:fs/promises')
+import { promises } from 'fs';
 
-async function load_file_async(filename) {
-    const file = await open(filename);
+export const load_file_async = async filename => {
+    try {
+        console.log("Loading file ", filename);
+        const file = await promises.open(filename, "r");
+        console.log("Opened file: ", file);
 
-    let lines = [];
-    for await (const line of file.readLines()) {
-        lines.push(line);
+        let lines = [];
+        for await (const line of file.readLines()) {
+            console.log("line: ", line);
+            lines.push(line);
+        }
+        return lines;
+    } catch (err) {
+        console.error(err);
     }
-    return lines;
 }
 
-function load_file(filename) {
-    load_file_async(filename).then(lines => lines);
+export const load_file = filename => {
+    let returnLines = null;
+    load_file_async(filename).then(lines => returnLines = lines);
+    console.log(returnLines);
+    return returnLines;
 }
 
-function load_all() {
+export const load_all = () => {
     return load_file("all-morphgnt.txt");
 }
 
-function all_chars(lines) {
+export const all_chars = lines => {
     let chars = new Set();
     for (let line of lines) {
         let parts = line.split(" ");

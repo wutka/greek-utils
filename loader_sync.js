@@ -1,6 +1,6 @@
-const fs = require("fs");
+import fs from "fs";
 
-const read_lines = (filename) => {
+export const readLines = (filename) => {
     const buff = fs.readFileSync(filename);
 
     let lines = [];
@@ -22,7 +22,7 @@ const read_lines = (filename) => {
     return lines;
 }
 
-function all_chars(lines) {
+export function allChars(lines) {
     let chars = new Set();
     for (let line of lines) {
         let parts = line.split(" ");
@@ -34,5 +34,3 @@ function all_chars(lines) {
     }
     return chars;
 }
-
-module.exports = {read_lines, all_chars}
