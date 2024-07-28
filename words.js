@@ -65,16 +65,26 @@ export const Degree = makeEnum({
 })
 
 export const splitGreekWord = word => {
+    for (let i=0; i < word.length; i++) {
+        if (!letterMap[word[i]]) {
+            console.log("Can't find letter ", word[i], " in ", word);
+        }
+    }
     return Array.from(word).map(letter => letterMap[letter]);
 }
 
 export class Word {
     constructor(word) {
         this.movableNu = false;
+        this.optionalSigma = false;
         if (word.endsWith("(ν)")) {
             this.movableNu = true;
             word = word.substring(0, word.length-3);
+        } else if (word.endsWith("(ς)")) {
+            this.optionalSigma = true;
+            word = word.substring(0, word.length-3);
         }
+
         this.word = splitGreekWord(word);
     }
 
@@ -89,41 +99,67 @@ export class Word {
         }
         return result;
     }
-}
 
-export class ParsedWord {
-    constructor(word, wordWithPunctuation, partOfSpeech, parsing) {
-        this.word = new Word(word);
-        this.wordWithPunctuation = wordWithPunctuation;
-        this.partOfSpeech = PartOfSpeech[partOfSpeech.replace("-","")];
-        this.person = 0;
-        if (parsing[0] !== "-") {
-            this.person = parseInt(parsing[0]);
-        }
-        this.tense = Tense[parsing[1]];
-        this.voice = Voice[parsing[2]];
-        this.mood = Mood[parsing[3]];
-        this.nounCase = Case[parsing[4]];
-        this.caseNumber = CaseNumber[parsing[5]];
-        this.gender = Gender[parsing[6]];
-        this.degree = Degree[parsing[7]];
+    toString() {
+        return this.toGreek();
     }
 }
 
-export const wordsByLemma = {}
+export class ParsedWord {
+    constructor(word, wordWithPunctuation, partOfSpeech, parsing, lemma) {
+        this.word = new Word(word);
+        this.wordWithPunctuation = wordWithPunctuation;
+        this.partOfSpeech = PartOfSpeech[partOfSpeech.replace("-","")];
+        this.parsing = parsing;
+        this.lemma = null;
+        this.bookChapterVerse = [];
+    }
+}
+
+export class Lemma {
+    constructor(lemma) {
+        this.word = new Word(lemma);
+        this.partsOfSpeech = {};
+    }
+}
+
+export const lemmas = {}
 export const verseLookup = {}
 
 export const initializeWordData = lines => {
     for (const line of lines) {
-        const [bookChapterVerse, partOfSpeech, parsing, punctuated, word, normalizedWord, lemma] =
+        let [bookChapterVerse, partOfSpeech, parsing, punctuated, word, normalizedWord, lemma] =
             line.split(" ");
-        const parsedWord = new ParsedWord(normalizedWord, punctuated, partOfSpeech, parsing);
-        const lemmaList = wordsByLemma[lemma];
-        if (!lemmaList) {
-            wordsByLemma[lemma] = [parsedWord];
-        } else {
-            lemmaList.push(parsedWord);
+        const parsedWord = new ParsedWord(normalizedWord, punctuated, partOfSpeech, parsing, lemma);
+        partOfSpeech = partOfSpeech.replace("-", "");
+
+        let lemmaObj = lemmas[lemma];
+        if (!lemmaObj) {
+            lemmaObj = new Lemma(lemma);
+            lemmas[lemma] = lemmaObj;
         }
+        parsedWord.lemma = lemmaObj;
+
+        let psMap = lemmaObj.partsOfSpeech[partOfSpeech];
+        if (!psMap) {
+            psMap = {};
+            lemmaObj.partsOfSpeech[partOfSpeech] = psMap;
+        }
+
+        let parsingMap = psMap[parsing];
+        if (!parsingMap) {
+            parsingMap = {};
+            psMap[parsing] = parsingMap;
+        }
+
+        const wordGreek = parsedWord.word.toGreek();
+        let lemmaWord = parsingMap[wordGreek];
+        if (!lemmaWord) {
+            lemmaWord = parsedWord;
+            parsingMap[wordGreek] = lemmaWord;
+        }
+        lemmaWord.bookChapterVerse.push(bookChapterVerse);
+
         const verseList = verseLookup[bookChapterVerse];
         if (!verseList) {
             verseLookup[bookChapterVerse] = [parsedWord];

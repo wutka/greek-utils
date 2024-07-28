@@ -9,7 +9,7 @@ export const makeEnum = values => {
         for (let [key, value]  of Object.entries(values)) {
             enums[key] = value;
             enums[value] = key;
-            enums[i] = value;
+            enums[i] = key;
         }
         return enums;
     } else {
