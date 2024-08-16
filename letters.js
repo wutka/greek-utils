@@ -32,8 +32,13 @@ export class Letter {
         this.diaeresis = diaeresis;
     }
 
+    copy() {
+        return new Letter(this.letter, this.isUpper, this.betaLetter, this.type,
+            this.accentType, this.breathing, this.iora, this.diaeresis);
+    }
+
     accentedBeta() {
-        let word = this.isUpper ? "*" : this.betaLetter;
+        let word = (this.isUpper ? "*" : "") + this.betaLetter;
         switch (this.breathing) {
             case Breathing.NONE:
                 break;
@@ -68,6 +73,14 @@ export class Letter {
         }
 
         return word;
+    }
+
+    toLower() {
+        if (!this.isUpper) return this;
+        const baseLetter = letterMap[this.plain];
+        const thisAsLower = this.copy();
+        thisAsLower.isUpper = false;
+        return thisAsLower;
     }
 }
 
