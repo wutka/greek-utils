@@ -100,8 +100,19 @@ export class Word {
         return result;
     }
 
-    toString() {
-        return this.toGreek();
+    chars() {
+        return this.word.slice(0);
+    }
+
+    startingConsonants() {
+        const starting = [];
+        const plainWord = this.toGreek(true);
+        for (let i=0; i < this.word.length; i++) {
+            if (this.word[i].type === LetterType.VOWEL) {
+                starting.push(word[i].toLower());
+            }
+        }
+        return starting;
     }
 }
 
@@ -125,6 +136,7 @@ export class Lemma {
 
 export const lemmas = {}
 export const verseLookup = {}
+export const wordStartConsonants = {}
 
 export const initializeWordData = lines => {
     for (const line of lines) {
@@ -132,6 +144,12 @@ export const initializeWordData = lines => {
             line.split(" ");
         const parsedWord = new ParsedWord(normalizedWord, punctuated, partOfSpeech, parsing, lemma);
         partOfSpeech = partOfSpeech.replace("-", "");
+
+        const starting = parsedWord.word.startingConsonants();
+        if (starting.length > 0) {
+            const startingWord = new Word()
+            wordStartConsonants
+        }
 
         let lemmaObj = lemmas[lemma];
         if (!lemmaObj) {

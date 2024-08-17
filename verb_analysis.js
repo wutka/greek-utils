@@ -20,6 +20,82 @@ const makeBetaWord = word => {
     }
     return betaWord;
 }
+
+const prefixes = {}
+
+const lookForPrefix = (aaiform, lemma) => {
+    const shortest = Math.min(aaiform.length, lemma.length);
+
+    if (shortest < 3) return;
+
+    for (let i=0; i < shortest-2; i++) {
+        if (aaiform[i] !== lemma[i]) {
+            if (i < 2) return;
+            if (!"AEIOUHZ".includes(aaiform[i])) {
+                return;
+            }
+            const pref = lemma.substring(0, i);
+            prefixes[pref] = pref;
+            return;
+        }
+    }
+}
+
+const contractions = word => {
+    return [word, []];
+}
+
+const computeConjugation = (verb, lemma, parsing) => {
+    const miVerb = lemma.endsWith("MI");
+    const lemmaRoot = lemma.substring(0, lemma.length-2);
+    let changes = [];
+    if (!miVerb) {
+        if (parsing[1] === "P" && !miVerb) {
+            if (parsing[2] === "A") {
+                if (parsing[3] === "I") {
+                    if (parsing[0] === "1") {
+                        if (parsing[5] === "S") {
+                            let conjugated = lemmaRoot + "W";
+                            changes.push(lemmaRoot + " + W");
+                            changes = changes + contractions(conjugated);
+                            return [conjugated, changes];
+                        } else if (parsing[5] === "P") {
+                            let conjugated = lemmaRoot + "OMEN";
+                            changes.push(lemmaRoot + " + O + MEN");
+                            changes = changes + contractions(conjugated);
+                            return [conjugated, changes];
+                        }
+                    } else if (parsing[0] === "2") {
+                        if (parsing[5] === "S") {
+                            let conjugated = lemmaRoot + "EES";
+                            changes.push(lemmaRoot + " + E + ES");
+                            changes = changes + contractions(conjugated);
+                            return [conjugated, changes];
+                        } else if (parsing[5] === "P") {
+                            let conjugated = lemmaRoot + "ETE";
+                            changes.push(lemmaRoot + " + E + TE");
+                            changes = changes + contractions(conjugated);
+                            return [conjugated, changes];
+                        }
+                    } else if (parsing[0] === "3") {
+                        if (parsing[5] === "S") {
+                            let conjugated = lemmaRoot + "EI";
+                            changes.push(lemmaRoot + " + E + I");
+                            changes = changes + contractions(conjugated);
+                            return [conjugated, changes];
+                        } else if (parsing[5] === "P") {
+                            let conjugated = lemmaRoot + "ONSI";
+                            changes.push(lemmaRoot + " + O + NSI");
+                            changes = changes + contractions(conjugated);
+                            return [conjugated, changes];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return ["", []]
+}
 const makeVerbTable = () => {
     const verbTable = {}
 
@@ -31,6 +107,10 @@ const makeVerbTable = () => {
         const parsing = parts[2];
         const word = makeBetaWord(parts[4]);
         const lemma = makeBetaWord(parts[6]);
+
+        if (parsing.substring(1, 4) === "AAI") {
+            lookForPrefix(word, lemma);
+        }
 
         let verbInfo = verbTable[lemma];
         if (!verbInfo) {
@@ -67,4 +147,7 @@ const printDuplicates = verbTable => {
 }
 const verbTable = makeVerbTable();
 //console.log(JSON.stringify(verbTable, null, 2));
-printDuplicates(verbTable);
+//printDuplicates(verbTable);
+for (const pref of Object.keys(prefixes)) {
+    console.log(pref);
+}
